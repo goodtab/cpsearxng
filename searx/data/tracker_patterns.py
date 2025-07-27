@@ -70,10 +70,14 @@ class TrackerPatternsDB:
     def iter_clear_list(self) -> Iterator[RuleType]:
         resp = None
         for url in self.CLEAR_LIST_URL:
-            resp = http_get(url, timeout=3)
-            if resp.status_code == 200:
-                break
-            log.warning(f"TRACKER_PATTERNS: ClearURL ignore HTTP {resp.status_code} {url}")
+            try:
+                log.debug("TRACKER_PATTERNS: Trying to fetch %s...", url)
+                resp = http_get(url, timeout=3)
+                if resp.status_code == 200:
+                    break
+                log.warning(f"TRACKER_PATTERNS: ClearURL ignore HTTP {resp.status_code} {url}")
+            except:
+                log.warning(f"TRACKER_PATTERNS: An error occured while fetching {url}")
 
         if resp is None:
             log.error("TRACKER_PATTERNS: failed fetching ClearURL rule lists")
